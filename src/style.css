@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200&family=Nabla&display=swap');
+
+html {
+  font-family: 'Nabla', cursive;
+}
+
+.inter {
+  font-family: 'Inter Tight', sans-serif;
+}
