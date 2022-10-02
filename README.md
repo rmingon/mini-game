@@ -1,24 +1,10 @@
 # dad
 
-## Project setup
-```
-npm install
-```
+just sprites editor
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+<a href="https://stackblitz.com/github/rmingon/mini-game">
+  <img
+    src="https://developer.stackblitz.com/img/open_in_stackblitz.svg"
+    alt="Open in StackBlitz"
+  />
+</a>
