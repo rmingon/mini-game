@@ -13,6 +13,17 @@
         <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="save()">Save</button>
         <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="grassGenerator()" >Reset</button>
       </div>
+      <div class="my-3">
+        <div v-for="title in saved_list" :key="title" class="flex flex-row cursor-pointer" >
+          <div>{{ title }}</div>
+          <div @click="deleteLS(title)">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12Z"/></svg>
+          </div>
+          <div @click="reload(title)">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 3c4.14 0 7.5 3.36 7.5 7.5V13h4l-6 7l-6-7h4v-2.5C14 8.57 12.43 7 10.5 7S7 8.57 7 10.5V18H3v-7.5C3 6.36 6.36 3 10.5 3Z"/></svg>
+          </div>
+        </div>
+      </div>
       <div class="flex flex-row flex-wrap overflow-scroll">
         <img v-for="(illu, i) in illustrations.keys()" :key="i" class="min-w-[16px] border" :src="require('@/assets/sprites'+illu.slice(1))" width="16" height="16" @click="editSpite(illu.slice(2))">
       </div>
@@ -31,6 +42,8 @@
 
   const grid_size = ref([40, 40])
 
+  const saved_list = ref(Object.keys(localStorage))
+
   const illustrations = require.context(
     '@/assets/sprites',
     true,
@@ -45,22 +58,22 @@
   }
 
   onKeyStroke('ArrowDown', (e) => {
-    console.log('down')
+    inEdit.value[1]++
     e.preventDefault()
   })
 
   onKeyStroke('ArrowUp', (e) => {
-    console.log('up')
+    inEdit.value[1]--
     e.preventDefault()
   })
 
   onKeyStroke('ArrowLeft', (e) => {
-    console.log('left')
+    inEdit.value[0]--
     e.preventDefault()
   })
 
   onKeyStroke('ArrowRight', (e) => {
-    console.log('right')
+    inEdit.value[0]++
     e.preventDefault()
   })
 
@@ -73,7 +86,18 @@
   }
 
   const save = () => {
-    localStorage.setItem('test', sprites.value);
+    let number_save = Object.keys(localStorage).length
+    localStorage.setItem('test'+number_save, JSON.stringify(sprites.value));
+    saved_list.value = Object.keys(localStorage)
+  }
+
+  const reload = (title) => {
+    sprites.value = JSON.parse(localStorage.getItem(title))
+  }
+
+  const deleteLS = (title) => {
+    localStorage.removeItem(title);
+    saved_list.value = Object.keys(localStorage)
   }
 
   const grassGenerator = () => {
