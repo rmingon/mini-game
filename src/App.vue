@@ -5,17 +5,23 @@
         <div class="flex basis-2/3 text-2xl w-full overflow-scroll shadow-2xl relative h-full">
           <div class="absolute top-0 left-0 h-full w-full">
             <div class="flex" v-for="(sprite_hor, index) in base_sprites" :key="index">
-              <SpriteItem v-for="(sprite_ver, i) in sprite_hor" :key="i" :link="spritesUrl(sprite_ver)" :position="[index, i]" :class="inEdit[0] === index && inEdit[1] === i ? 'border' : ''" />
+              <SpriteItem v-for="(sprite_ver, i) in sprite_hor" :key="i" :link="spriteUrl(sprite_ver)" :position="[index, i]" :class="inEdit[0] === index && inEdit[1] === i ? 'border' : ''" />
             </div>
           </div>
           <div v-for="(layer, layer_index) in layers" :key="layer_index" class="flex absolute" :class="['z-['+ (layer_index+1) +']', layers_showed[layer_index] ? '' : 'hidden']">
             <div v-for="(sprite_hor, index_hor) in layer" :key="index_hor">
-              <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spritesUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
+              <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
+            </div>
+          </div>
+          <div class="flex absolute z-100" v-if="mode === 'play'">
+            <div v-for="(sprite_hor, index_hor) in layer" :key="index_hor">
+              <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
             </div>
           </div>
         </div>
         <div class="basis-1/3 flex flex-col h-screen">
-          <EditorButton :layers="layers" :layers_showed="layers_showed" @addLayer="addLayer" @selectLayer="selectLayer" @showLayer="showLayer" @removeLayer="removeLayer"/>
+          <EditorButton :layers="layers" :layers_showed="layers_showed" :layer_in_edit="layer_in_edit" @addLayer="spritesEditor.addLayer" @selectLayer="selectLayer" @showLayer="showLayer" @removeLayer="removeLayer"/>
+          <ModeButton :mode="mode" @useMode="useMode"/>
           <div class="my-3">
             <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="save()">Save</button>
             <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="layers = [emptyGenerator()]">Reset</button>
@@ -46,15 +52,26 @@
   import { ref, computed } from 'vue'
   import SpriteItem from './components/SpriteItem.vue'
   import EditorButton from './components/EditorButton.vue';
+  import ModeButton from './components/ModeButton.vue';
+  import Layers from './layers';
 
-  const layers = ref([])
+
+  const mode = ref('edit')
+
+  // const layers = ref([])
   const layers_opacitiy = ref([])
-  const layers_showed = ref([])
+  // const layers_showed = ref([])
+
+  let spritesEditor = new Layers([40, 40])
+  const layers = spritesEditor.layers
+  const layers_showed = spritesEditor.layers_showed
 
   const inEdit = ref([0, 0, 0])
+  const layer_in_edit = ref(0)
   const sprites = ref([[]])
 
   const base_sprites = ref([[]])
+  const play_sprites = ref([[]])
 
   const grid_size = ref([40, 40])
 
@@ -69,7 +86,7 @@
   const illustrations_filtered = computed(() => {
     let sprites_filtered = []
     illustrations.keys().forEach(illu => {
-      // if (require('@/assets/sprites'+illu.slice(1)) !== 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAATSURBVDhPYxgFo2AUjAIwYGAAAAQQAAGnRHxjAAAAAElFTkSuQmCC') // transparent sprite
+      if (require('@/assets/sprites'+illu.slice(1)) !== 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAATSURBVDhPYxgFo2AUjAIwYGAAAAQQAAGnRHxjAAAAAElFTkSuQmCC') // transparent sprite
         sprites_filtered.push(illu)
     })
     return sprites_filtered
@@ -77,16 +94,19 @@
   
   const setPosition = (e) => {
     inEdit.value = e
+    inEdit.value[0] = layer_in_edit.value
   }
 
+  /*
   const addLayer = () => {
     layers.value.push(emptyGenerator())
-    layers_showed.value = layers_showed.value.map(() => false) // .map(() => false) don't work :-(
     layers_showed.value.push(true)
+    inEdit.value = [0, 0, 0]
   }
+  */
 
   const selectLayer = (index) => {
-    layers_showed.value[index] = !layers_showed.value[index]
+    layer_in_edit.value = index
   }
 
   const showLayer = (index) => {
@@ -94,9 +114,13 @@
   }
 
   const removeLayer = (index) => {
-    console.log(index)
-    layers.value[index] = delete layers.value[index]
-    layers_showed.value[index] = delete layers_showed.value[index]
+    layers.value = layers.value.filter((layer, i) => i === index)
+    layers_showed.value = layers_showed.value.filter((layer, i) => i === index)
+  }
+
+  const useMode = (type) => {
+    console.log(type)
+    mode.value = type
   }
 
   onKeyStroke('ArrowDown', (e) => {
@@ -117,7 +141,7 @@
   onKeyStroke('ArrowRight', (e) => {
     inEdit.value[1]++
     e.preventDefault()
-    })
+  })
 
   const grassSprites = ['Overworld_213.png']
 
@@ -146,31 +170,34 @@
     saved_list.value = Object.keys(localStorage)
   }
 
-const grassGenerator = () => {
-  let hor = []
-  let ver = []
-  for (let i = 0; i < grid_size.value[0]; i++) {
-    for (let i = 0; i < grid_size.value[1]; i++) {
-      hor.push(grassSprites[Math.floor(Math.random() * grassSprites.length)])
+  const grassGenerator = () => {
+    let hor = []
+    let ver = []
+    for (let i = 0; i < grid_size.value[0]; i++) {
+      for (let i = 0; i < grid_size.value[1]; i++) {
+        hor.push(grassSprites[Math.floor(Math.random() * grassSprites.length)])
+      }
+      ver.push(hor)
+      hor = []
     }
-    ver.push(hor)
-    hor = []
+    return ver
   }
-  return ver
-}
 
-const emptyGenerator = () => {
-  let hor = []
-  let ver = []
-  for (let i = 0; i < grid_size.value[0]; i++) {
-    for (let i = 0; i < grid_size.value[1]; i++) {
-      hor.push(emptySprite)
+  const emptyGenerator = () => {
+    let hor = []
+    let ver = []
+    for (let i = 0; i < grid_size.value[0]; i++) {
+      for (let i = 0; i < grid_size.value[1]; i++) {
+        hor.push(emptySprite)
+      }
+      ver.push(hor)
+      hor = []
     }
-    ver.push(hor)
-    hor = []
+    return ver
   }
-  return ver
-}
+
+  play_sprites.value = emptyGenerator()
+  play_sprites.value[0][0] = ''
 
   base_sprites.value = grassGenerator()
 
@@ -178,7 +205,7 @@ const emptyGenerator = () => {
   layers_opacitiy.value.push(1)
   layers_showed.value.push(true)
 
-  const spritesUrl = (sprite) => {
+  const spriteUrl = (sprite) => {
     try {
       return require(`@/assets/sprites/${sprite}`)
     } catch (e) {
