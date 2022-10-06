@@ -10,7 +10,7 @@
           </div>
           <div v-for="(layer, layer_index) in layers" :key="layer_index" class="flex absolute" :class="['z-['+ (layer_index+1) +']', layers_showed[layer_index] ? '' : 'hidden']">
             <div v-for="(sprite_hor, index_hor) in layer" :key="index_hor">
-              <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
+              <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="spritesEditor.setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
             </div>
           </div>
           <div class="flex absolute z-100" v-if="mode === 'play'">
@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="basis-1/3 flex flex-col h-screen">
-          <EditorButton :layers="layers" :layers_showed="layers_showed" :layer_in_edit="layer_in_edit" @addLayer="spritesEditor.addLayer" @selectLayer="selectLayer" @showLayer="showLayer" @removeLayer="removeLayer"/>
+          <EditorButton :layers="spritesEditor.layers" :layers_showed="spritesEditor.layers_showed" :layer_in_edit="spritesEditor.layers_in_edit" @addLayer="spritesEditor.addLayer" @selectLayer="spritesEditor.selectLayer" @showLayer="spritesEditor.showLayer" @removeLayer="spritesEditor.removeLayer"/>
           <ModeButton :mode="mode" @useMode="useMode"/>
           <div class="my-3">
             <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="save()">Save</button>
@@ -58,16 +58,11 @@
 
   const mode = ref('edit')
 
-  // const layers = ref([])
-  const layers_opacitiy = ref([])
-  // const layers_showed = ref([])
-
   let spritesEditor = new Layers([40, 40])
-  const layers = spritesEditor.layers
-  const layers_showed = spritesEditor.layers_showed
-
-  const inEdit = ref([0, 0, 0])
-  const layer_in_edit = ref(0)
+  const layers = spritesEditor._layers
+  const layers_showed = spritesEditor._layers_showed
+  
+  const inEdit = spritesEditor._in_edit
   const sprites = ref([[]])
 
   const base_sprites = ref([[]])
@@ -92,18 +87,18 @@
     return sprites_filtered
   })
   
+/*
   const setPosition = (e) => {
     inEdit.value = e
     inEdit.value[0] = layer_in_edit.value
   }
 
-  /*
   const addLayer = () => {
     layers.value.push(emptyGenerator())
     layers_showed.value.push(true)
     inEdit.value = [0, 0, 0]
   }
-  */
+  
 
   const selectLayer = (index) => {
     layer_in_edit.value = index
@@ -117,6 +112,8 @@
     layers.value = layers.value.filter((layer, i) => i === index)
     layers_showed.value = layers_showed.value.filter((layer, i) => i === index)
   }
+
+  */
 
   const useMode = (type) => {
     console.log(type)
@@ -200,10 +197,6 @@
   play_sprites.value[0][0] = ''
 
   base_sprites.value = grassGenerator()
-
-  layers.value.push(emptyGenerator())
-  layers_opacitiy.value.push(1)
-  layers_showed.value.push(true)
 
   const spriteUrl = (sprite) => {
     try {
