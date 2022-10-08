@@ -14,13 +14,14 @@
             </div>
           </div>
           <div class="flex absolute z-100" v-if="mode === 'play'">
-            <div v-for="(sprite_hor, index_hor) in layer" :key="index_hor">
+            <div v-for="(sprite_hor, index_hor) in player.layer" :key="index_hor">
               <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
             </div>
           </div>
         </div>
         <div class="basis-1/3 flex flex-col h-screen">
           <EditorButton :layers="spritesEditor.layers" :layers_showed="spritesEditor.layers_showed" :layer_in_edit="spritesEditor.layers_in_edit" @addLayer="spritesEditor.addLayer" @selectLayer="spritesEditor.selectLayer" @showLayer="spritesEditor.showLayer" @removeLayer="spritesEditor.removeLayer"/>
+          
           <ModeButton :mode="mode" @useMode="useMode"/>
           <div class="my-3">
             <button class="m-1 p-2 border rounded hover:bg-slate-400" @click="save()">Save</button>
@@ -54,11 +55,13 @@
   import EditorButton from './components/EditorButton.vue';
   import ModeButton from './components/ModeButton.vue';
   import Layers from './layers';
+  import Player from './player';
 
 
   const mode = ref('edit')
 
   let spritesEditor = new Layers([40, 40])
+  let player = new Player()
   const layers = spritesEditor._layers
   const layers_showed = spritesEditor._layers_showed
   
@@ -66,7 +69,6 @@
   const sprites = ref([[]])
 
   const base_sprites = ref([[]])
-  const play_sprites = ref([[]])
 
   const grid_size = ref([40, 40])
 
@@ -86,34 +88,6 @@
     })
     return sprites_filtered
   })
-  
-/*
-  const setPosition = (e) => {
-    inEdit.value = e
-    inEdit.value[0] = layer_in_edit.value
-  }
-
-  const addLayer = () => {
-    layers.value.push(emptyGenerator())
-    layers_showed.value.push(true)
-    inEdit.value = [0, 0, 0]
-  }
-  
-
-  const selectLayer = (index) => {
-    layer_in_edit.value = index
-  }
-
-  const showLayer = (index) => {
-    layers_showed.value[index] = !layers_showed.value[index]
-  }
-
-  const removeLayer = (index) => {
-    layers.value = layers.value.filter((layer, i) => i === index)
-    layers_showed.value = layers_showed.value.filter((layer, i) => i === index)
-  }
-
-  */
 
   const useMode = (type) => {
     console.log(type)
@@ -121,22 +95,38 @@
   }
 
   onKeyStroke('ArrowDown', (e) => {
-    inEdit.value[2]++
+    if (mode.value === 'edit')
+      inEdit.value[2]++
+    if (mode.value === 'play') {
+      player.down()
+    }
     e.preventDefault()
   })
 
   onKeyStroke('ArrowUp', (e) => {
-    inEdit.value[2]--
+    if (mode.value === 'edit')
+      inEdit.value[2]--
+    if (mode.value === 'play') {
+      player.up()
+    }
     e.preventDefault()
   })
 
   onKeyStroke('ArrowLeft', (e) => {
-    inEdit.value[1]--
+    if (mode.value === 'edit')
+      inEdit.value[1]--
+    if (mode.value === 'play') {
+      player.left()
+    }
     e.preventDefault()
   })
 
   onKeyStroke('ArrowRight', (e) => {
-    inEdit.value[1]++
+    if (mode.value === 'edit')
+      inEdit.value[1]++
+    if (mode.value === 'play') {
+      player.right()
+    }
     e.preventDefault()
   })
 
@@ -193,8 +183,6 @@
     return ver
   }
 
-  play_sprites.value = emptyGenerator()
-  play_sprites.value[0][0] = ''
 
   base_sprites.value = grassGenerator()
 

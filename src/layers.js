@@ -58,8 +58,8 @@ export default class Layers {
   }
 
   selectLayer = (index) => {
-    console.log(index)
     this.layer_in_edit = index
+    this.showLayer(index)
   }
 
   showLayer = (index) => {
