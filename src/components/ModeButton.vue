@@ -2,6 +2,7 @@
   <div class="flex flex-row ml-1 mt-2">
     <div @click="emit('useMode', 'play')" class="border px-3 py-1 cursor-pointer hover:bg-slate-300 text-xl rounded-l" :class="[mode === 'play' ? 'bg-slate-200' : '']">Play</div>
     <div @click="emit('useMode', 'edit')" class="border px-3 py-1 cursor-pointer hover:bg-slate-300 text-xl rounded-r" :class="[mode === 'edit' ? 'bg-slate-200' : '']">Edit</div>
+    <div @click="emit('useMode', 'collision')" class="border px-3 py-1 cursor-pointer hover:bg-slate-300 text-xl rounded-r" :class="[mode === 'collision' ? 'bg-slate-200' : '']">Collision</div>
   </div>
 </template>
 

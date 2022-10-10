@@ -18,6 +18,11 @@
               <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="setPosition" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
             </div>
           </div>
+          <div class="flex absolute z-101" v-if="mode === 'collision'">
+            <div v-for="(sprite_hor, index_hor) in player.collision.layer" :key="index_hor">
+              <ColorItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :position="[index_hor, index_ver]" @onClick="player.setCollision"/>
+            </div>
+          </div>
         </div>
         <div class="basis-1/3 flex flex-col h-screen">
           <EditorButton :layers="spritesEditor.layers" :layers_showed="spritesEditor.layers_showed" :layer_in_edit="spritesEditor.layers_in_edit" @addLayer="spritesEditor.addLayer" @selectLayer="spritesEditor.selectLayer" @showLayer="spritesEditor.showLayer" @removeLayer="spritesEditor.removeLayer"/>
@@ -56,6 +61,7 @@
   import ModeButton from './components/ModeButton.vue';
   import Layers from './layers';
   import Player from './player';
+  import ColorItem from './components/ColorItem.vue';
 
 
   const mode = ref('edit')
@@ -70,7 +76,7 @@
 
   const base_sprites = ref([[]])
 
-  const grid_size = ref([40, 40])
+  const grid_size = [40, 40]
 
   const saved_list = ref(Object.keys(localStorage))
 
@@ -90,7 +96,6 @@
   })
 
   const useMode = (type) => {
-    console.log(type)
     mode.value = type
   }
 
@@ -160,8 +165,8 @@
   const grassGenerator = () => {
     let hor = []
     let ver = []
-    for (let i = 0; i < grid_size.value[0]; i++) {
-      for (let i = 0; i < grid_size.value[1]; i++) {
+    for (let i = 0; i < grid_size[0]; i++) {
+      for (let i = 0; i < grid_size[1]; i++) {
         hor.push(grassSprites[Math.floor(Math.random() * grassSprites.length)])
       }
       ver.push(hor)
@@ -173,8 +178,8 @@
   const emptyGenerator = () => {
     let hor = []
     let ver = []
-    for (let i = 0; i < grid_size.value[0]; i++) {
-      for (let i = 0; i < grid_size.value[1]; i++) {
+    for (let i = 0; i < grid_size[0]; i++) {
+      for (let i = 0; i < grid_size[1]; i++) {
         hor.push(emptySprite)
       }
       ver.push(hor)

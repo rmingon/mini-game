@@ -29,6 +29,10 @@ export default class Player {
     this._layer.value[0][0] = 'character_003.png'
   }
 
+  setCollision(pos) {
+    this.collision.layer[pos[0]][pos[1]] = true
+  }
+
   up() {
     this._layer.value[this.x][this.y] = this.empty_sprite
     this.y = this.y - 1
