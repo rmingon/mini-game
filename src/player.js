@@ -24,8 +24,8 @@ export default class Player {
     return this._layer.value
   }
 
-  constructor() {
-    this.layer = emptyGenerator([40, 40])
+  constructor(grid = [40, 40]) {
+    this.layer = emptyGenerator(grid)
     this._layer.value[0][0] = 'character_003.png'
   }
 
@@ -57,4 +57,10 @@ export default class Player {
     this._layer.value[this.x][this.y] = 'character_020.png'
   }
 
+  attack() {
+    this._layer.value[this.x][this.y] = 'character_008.png'
+    setTimeout(() => {
+      this._layer.value[this.x][this.y] = 'character_020.png'
+    }, 1000);
+  }
 }

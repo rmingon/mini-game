@@ -8,7 +8,7 @@
               <SpriteItem v-for="(sprite_ver, i) in sprite_hor" :key="i" :link="spriteUrl(sprite_ver)" :position="[index, i]" :class="inEdit[0] === index && inEdit[1] === i ? 'border' : ''" />
             </div>
           </div>
-          <div v-for="(layer, layer_index) in layers" :key="layer_index" class="flex absolute" :class="['z-['+ (layer_index+1) +']', spritesEditor.layers_showed[layer_index] ? '' : 'hidden']">
+          <div v-for="(layer, layer_index) in spritesEditor.layers" :key="layer_index" class="flex absolute" :class="['z-['+ (layer_index+1) +']', spritesEditor.layers_showed[layer_index] ? '' : 'hidden']">
             <div v-for="(sprite_hor, index_hor) in layer" :key="index_hor">
               <SpriteItem v-for="(sprite_ver, index_ver) in sprite_hor" :key="index_ver" :link="spriteUrl(sprite_ver)" :position="[layer_index, index_hor, index_ver]" @onClick="spritesEditor.setPosition($event)" :class="inEdit[0] === layer_index && inEdit[1] === index_hor && inEdit[2] === index_ver ? 'border' : ''" />
             </div>
@@ -76,8 +76,7 @@
 
   let spritesEditor = new Layers(grid_size)
 
-  let player = new Player()
-  const layers = spritesEditor.layers
+  let player = new Player(grid_size)
   
   const inEdit = spritesEditor._in_edit
   const sprites = ref([[]])
@@ -123,6 +122,14 @@
     if (mode.value === 'play') {
       player.right()
     }
+    e.preventDefault()
+  })
+
+  onKeyStroke(' ', (e) => {
+    console.log("space")
+    if (mode.value === 'play')
+      player.attack()
+
     e.preventDefault()
   })
 

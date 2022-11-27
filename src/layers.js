@@ -34,6 +34,7 @@ export default class Layers {
 
   showLayer(index) {
     this._layers.value[index].visible = !this._layers.value[index].visible
+    this._layers.value.map(el => console.log(el.visible))
   }
 
   removeLayer(index) {
@@ -41,7 +42,7 @@ export default class Layers {
   }
 
   selectLayer(index) {
-    console.log(index)
+    this.in_edit[0] = index
   }
 
   setPosition(e) {
