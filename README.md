@@ -1,6 +1,6 @@
-# dad
+# DAD
 
-just sprites editor
+just RPG maker
 
 <a href="https://stackblitz.com/github/rmingon/mini-game">
   <img
