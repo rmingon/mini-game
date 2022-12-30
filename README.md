@@ -23,6 +23,7 @@ npm run start
 
 - [x] Layers & Layer object
 - [x] Move player
+- [x] Multi layer
 - [ ] Event layer
 - [ ] Collision layer
 - [ ] Pathfinding
