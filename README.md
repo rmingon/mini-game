@@ -22,7 +22,7 @@ npm run start
 ### TODO
 
 - [x] Layers & Layer object
-- [x] Collision between cars
+- [x] Move player
 - [ ] Event layer
 - [ ] Collision layer
 - [ ] Pathfinding
